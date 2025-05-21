@@ -11,8 +11,11 @@ const dotenv = require('dotenv'); // Loads environment variables from a .env fil
 // --- DEBUGGING LINES START ---
 console.log('--- Dotenv Debugging ---');
 console.log('Current working directory (process.cwd()):', process.cwd());
-const dotenvResult = dotenv.config(); // Load environment variables from .env file
-console.log('Dotenv config result:', dotenvResult); // Shows if .env was found and parsed
+// IMPORTANT: dotenv.config() is only needed for local development.
+// On Render, environment variables are set directly in the dashboard.
+// Comment out or remove this line when deploying to Render.
+// const dotenvResult = dotenv.config(); // Load environment variables from .env file
+// console.log('Dotenv config result:', dotenvResult); // Shows if .env was found and parsed
 console.log('Value of process.env.MONGO_URI (after dotenv.config()):', process.env.MONGO_URI);
 console.log('Value of process.env.JWT_SECRET (after dotenv.config()):', process.env.JWT_SECRET);
 console.log('--- End Dotenv Debugging ---');
@@ -33,10 +36,10 @@ const app = express();
 const server = http.createServer(app);
 // Initialize Socket.IO with the HTTP server
 const io = socketIo(server, {
-  cors: {
-    origin: "*", // Allow all origins for development. In production, specify your Flutter app's domain.
-    methods: ["GET", "POST"]
-  }
+  cors: {
+    origin: "*", // Allow all origins for development. In production, specify your Flutter app's domain.
+    methods: ["GET", "POST"]
+  }
 });
 
 // Connect to MongoDB
@@ -57,8 +60,4 @@ handleChatSockets(io); // Pass the Socket.IO instance to the handler
 const PORT = process.env.PORT || 3000; // Use port from .env or default to 3000
 
 // Start the server
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`HTTP API available at http://localhost:${PORT}/api`);
-  console.log(`WebSocket server available at ws://localhost:${PORT}`);
-});
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
