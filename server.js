@@ -7,17 +7,17 @@ const socketIo = require('socket.io'); // WebSocket library for real-time commun
 const mongoose = require('mongoose'); // MongoDB object modeling tool
 const cors = require('cors'); // Middleware for enabling Cross-Origin Resource Sharing
 const dotenv = require('dotenv'); // Loads environment variables from a .env file
+const path = require('path'); // Node.js path module for serving static files
+
+// Load environment variables from .env file (for local development)
+// On Render, environment variables are set directly in the dashboard.
+dotenv.config();
 
 // --- DEBUGGING LINES START ---
 console.log('--- Dotenv Debugging ---');
 console.log('Current working directory (process.cwd()):', process.cwd());
-// IMPORTANT: dotenv.config() is only needed for local development.
-// On Render, environment variables are set directly in the dashboard.
-// Comment out or remove this line when deploying to Render.
-// const dotenvResult = dotenv.config(); // Load environment variables from .env file
-// console.log('Dotenv config result:', dotenvResult); // Shows if .env was found and parsed
-console.log('Value of process.env.MONGO_URI (after dotenv.config()):', process.env.MONGO_URI);
-console.log('Value of process.env.JWT_SECRET (after dotenv.config()):', process.env.JWT_SECRET);
+console.log('Value of process.env.MONGO_URI:', process.env.MONGO_URI);
+console.log('Value of process.env.JWT_SECRET:', process.env.JWT_SECRET);
 console.log('--- End Dotenv Debugging ---');
 // --- DEBUGGING LINES END ---
 
@@ -38,7 +38,8 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: "*", // Allow all origins for development. In production, specify your Flutter app's domain.
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST", "PUT", "DELETE"], // Added PUT and DELETE for profile updates, etc.
+    credentials: true // Allow cookies to be sent (if applicable, though not strictly needed for JWT in headers)
   }
 });
 
@@ -49,9 +50,14 @@ connectDB(); // This calls the function from db.js
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse JSON request bodies
 
+// Serve static files from the 'uploads' directory
+// This makes files in 'uploads/profile_pics' accessible via '/uploads/profile_pics/...'
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 // API Routes
 app.use('/api/auth', authRoutes); // Authentication routes (signup, login)
-app.use('/api/users', userRoutes); // User-related routes (get all users, search)
+app.use('/api/users', userRoutes); // User-related routes (get all users, search, profile updates, profile picture upload)
 
 // Socket.IO connection handling
 handleChatSockets(io); // Pass the Socket.IO instance to the handler

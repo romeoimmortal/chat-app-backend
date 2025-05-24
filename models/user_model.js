@@ -5,19 +5,46 @@ const mongoose = require('mongoose'); // MongoDB object modeling tool
 const bcrypt = require('bcryptjs'); // For hashing passwords
 
 const UserSchema = new mongoose.Schema({
-  username: {
+  // Changed from 'username' to 'email' to match Flutter app's authentication
+  email: {
     type: String,
     required: true,
-    unique: true, // Ensure usernames are unique
+    unique: true, // Ensure emails are unique
     trim: true, // Remove whitespace from both ends of a string
-    minlength: 3, // Minimum length for username
+    lowercase: true, // Store emails in lowercase for consistency
   },
   password: {
     type: String,
     required: true,
     minlength: 6, // Minimum length for password
   },
-  createdAt: {
+  // New fields to match the ChatUser model in Flutter
+  fullName: { // Corresponds to 'name' in Flutter's ChatUser
+    type: String,
+    required: true,
+    trim: true,
+  },
+  profilePic: { // Corresponds to 'image' in Flutter's ChatUser
+    type: String,
+    default: '', // Default empty string if no profile picture
+  },
+  about: { // Corresponds to 'about' in Flutter's ChatUser
+    type: String,
+    default: 'Hey, I\'m using We Chat!', // Default about status
+  },
+  isOnline: { // Corresponds to 'isOnline' in Flutter's ChatUser
+    type: Boolean,
+    default: false,
+  },
+  lastActive: { // Corresponds to 'lastActive' in Flutter's ChatUser (timestamp)
+    type: Date,
+    default: null, // Null initially, updated on disconnect/connect
+  },
+  pushToken: { // Corresponds to 'pushToken' in Flutter's ChatUser (for push notifications)
+    type: String,
+    default: '',
+  },
+  createdAt: { // Corresponds to 'createdAt' in Flutter's ChatUser (timestamp)
     type: Date,
     default: Date.now, // Automatically set creation timestamp
   },

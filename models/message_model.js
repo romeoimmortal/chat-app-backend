@@ -1,5 +1,5 @@
 // models/message_model.js
-// Defines the Mongoose schema and model for Message.
+// Defines the Mongoose schema and model for Message, now including read status and message type.
 
 const mongoose = require('mongoose'); // MongoDB object modeling tool
 
@@ -23,7 +23,17 @@ const MessageSchema = new mongoose.Schema({
     type: Date,
     default: Date.now, // Automatically set message timestamp
   },
-  // You might add a 'read' status, 'media' field, etc. later
+  // New fields to align with old Firebase Message model
+  readStatus: { // Corresponds to 'read' in old Firebase Message (empty string if not read, timestamp if read)
+    type: Date, // Store as Date, will be null if not read, or a Date object
+    default: null, // Default to null (not read)
+  },
+  type: { // Corresponds to 'type' in old Firebase Message (text or image)
+    type: String,
+    enum: ['text', 'image'], // Enforce type to be either 'text' or 'image'
+    required: true,
+    default: 'text', // Default message type is text
+  },
 });
 
 module.exports = mongoose.model('Message', MessageSchema); // Export the Message model

@@ -25,8 +25,8 @@ module.exports = function (req, res, next) {
     const decoded = jwt.verify(actualToken, process.env.JWT_SECRET);
 
     // Attach user information from the token payload to the request object
-    // This makes user.id and user.username available in subsequent route handlers
-    req.user = decoded.user;
+    // This makes user.id, user.username, and now user.fullName available in subsequent route handlers
+    req.user = decoded.user; // decoded.user should now contain id, username, and fullName
     next(); // Move to the next middleware/route handler
   } catch (err) {
     // If token is not valid (e.g., expired, malformed)
